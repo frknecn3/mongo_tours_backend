@@ -13,6 +13,7 @@ module.exports = (req, res, next) => {
   // delete queryObj.page;
   // delete queryObj.limit;
 
+
   const fields = ["sort", "fields", "page", "limit"];
   fields.forEach((el) => delete queryObj[el]);
 

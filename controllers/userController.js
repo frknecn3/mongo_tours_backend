@@ -2,17 +2,9 @@ const User = require("../models/userModel");
 const c = require("../utils/catchAsync");
 const e = require("../utils/error");
 const { filterObject } = require("../utils/filterObject");
+const factory = require("./handlerFactory")
 
-exports.getAllUsers = c(async(req, res) => {
-
-  const users = await User.find();
-
-  res.status(200).json({
-    success:true,
-    results: users.length,
-    data:users
-  });
-})
+exports.getAllUsers = factory.getAll(User);
 
 exports.createUser = c(async(req, res) => {
 
@@ -32,6 +24,8 @@ exports.createUser = c(async(req, res) => {
   res.status(200).json({success:true,message:"Kullanıcı başarıyla oluşturuldu",newUser});
 
 })
+
+// id'sine göre bir kullanıcı döndüren fonksiyon
 
 exports.getUser = c(async (req, res,next) => {
 
@@ -109,6 +103,4 @@ exports.activateAccount = c(async(req,res,next)=>{
     message:`Hesap başarıyla ${active? "aktifleştirildi." : "askıya alındı."}`})
 })
 
-exports.deleteUser = (req, res) => {
-  res.status(200).json("deleteUser çalıştı");
-};
+exports.deleteUser = factory.deleteOne(User)

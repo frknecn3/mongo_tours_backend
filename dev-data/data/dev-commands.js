@@ -3,9 +3,11 @@
 const fs = require("fs");
 const mongoose = require("mongoose");
 const Tour = require("../../models/tourModel.js");
+const Review = require("../../models/reviewModel.js");
 
 //json dosyasında verileri al
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours-simple.json`));
+const reviews = JSON.parse(fs.readFileSync(`${__dirname}/reviews.json`));
 
 // dotenv kütüphanesini çevre değişkenlerine erişmek için kuruyoruz.
 require("dotenv").config();
@@ -19,7 +21,11 @@ mongoose
 //devdata klasöründeki json dosyalarından verileri alıp mpngodb ye aktar
 const importData = async () => {
   try {
+
+    // tours yani json dosyasında tuttuğumuz örnek tur verilerini alttaki komut ile Mongo'daki koleksiyonumuza aktarmış olduk, validateBeforeSave = false diyerek de içerideki veriler modele uygun mu değil mi kontrol etme demiş olduk
+
     await Tour.create(tours, { validateBeforeSave: false });
+    await Review.create(reviews, {validateBeforeSave: false});
     console.log("Json verileri koleksiyona aktarıldı");
   } catch (error) {
     console.log(error);
@@ -32,6 +38,7 @@ const importData = async () => {
 const deleteData = async () => {
   try {
     await Tour.deleteMany();
+    await Review.deleteMany();
     console.log("Bütün veriler temizlendi");
   } catch (error) {
     console.log(error);

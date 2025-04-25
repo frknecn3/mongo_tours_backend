@@ -1,5 +1,5 @@
 // tour verisinin backendde yönetimi için schema ve model dosya da tanımlanacak
-const { Schema, model } = require("mongoose");
+const { Schema, model, default: mongoose } = require("mongoose");
 const validator = require("validator");
 
 // veritabanına kaydedilecek olan verilerin  kısıtlamalarını yazıcaz
@@ -88,6 +88,14 @@ const tourSchema = new Schema(
     hour: {
       type: Number,
     },
+
+    // reference yani veritabanındaki başka bir veri tipine olan yönlendirme
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId, // Referans tanımlarken tipi her zaman object ID olur
+        ref: "User"
+      }
+    ]
   },
   //şema ayarları
   {
@@ -155,6 +163,23 @@ tourSchema.post("aggregate", function (doc, next) {
   console.log("raporlama işleminden hemen sonra çalıştı");
   next();
 });
+
+
+// Turları veritabanından çekmeye çalıştığımızda rehberleri ID olarak değil, gerçekten rehber nesneleri olarak gönder.
+
+tourSchema.pre(/^find/, function (next){
+  // sorgudaki rehberler dizisi şuan sadece IDleri tutuyor, kullanıcıya göndermeden önce bu verileri gerçek kullanıcılarla değiştir
+  this.populate({
+    path: "guides",
+    // populate işlemi yaparken yani ID kullanarak gerçek kullanıcı verilerini çekerken almayacağımız kısımları belirtiyoruz.
+    select:
+    "-password -__v -passResetToken -passResetExpires -passChangedAt"
+  });
+
+  next();
+})
+
+
 
 //model oluştur (veritanaınd akş tur verisini yönetmek için kullanacağız)
 const Tour = model("Tour", tourSchema);

@@ -143,7 +143,7 @@ exports.login = c(async (req, res, next) => {
 
   if (!user) {
     return next(
-      e(404, "Girdiğiniz e-posta ile kayıtlı kullanıcı bulunmamaktadır.")
+      e(404, "E-posta veya şifreniz yanlış ya da böyle bir kullanıcı yok.")
     );
   }
 

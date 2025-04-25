@@ -1,6 +1,8 @@
 //API'a gelen tur ile alakalı http isteklerine cevap gönderen bütün dosyalar bu dosya da yer alacak
 const Tour = require("../models/tourModel.js");
 const APIFeatures = require("../utils/apiFeatures.js");
+const c = require("../utils/catchAsync.js")
+const factory = require('./handlerFactory.js')
 
 // getTourStats: Zorluk seviyesine göre tur istatistiklerini hesapla
 exports.getTourStats = async (req, res, next) => {
@@ -99,28 +101,8 @@ exports.aliasTopTours = async (req, res, next) => {
   next();
 };
 
-exports.getAllTours = async (req, res) => {
-  try {
-    //! 1) API Features classından örnek al (geriye sorguyu oluşturup döndürür)
-
-    const features = new APIFeatures(Tour.find(), req.query, req.formattedQuery)
-      .filter()
-      .sort()
-      .limit()
-      .pagination();
-
-    //sorguyu çalıştır
-    const tours = await features.query;
-
-    res.status(200).json({
-      message: "Bütün turlar alınıdı",
-      results: tours.length,
-      tours,
-    });
-  } catch (error) {
-    res.status(400).json({ message: "Bir hata oluştu", error: error.message });
-  }
-};
+//handlerFactory'den bütün verileri çekme fonksiyonunu çağırdık ve çekilecek veri türünün Tour olduğunu belirledik.
+exports.getAllTours = factory.getAll(Tour);
 
 exports.createTour = async (req, res) => {
   try {
@@ -131,7 +113,7 @@ exports.createTour = async (req, res) => {
   }
 };
 
-// id'sine göre bir tur alır
+// id'sine göre bir tur döndüren fonksiyon
 exports.getTour = async (req, res) => {
   console.log(req.params);
   console.log(req.params.id);
@@ -145,23 +127,7 @@ exports.getTour = async (req, res) => {
 };
 
 //id'sine göre bir turu güncelle
-exports.updateTour = async (req, res) => {
-  try {
-    const updateTour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
-    res.status(200).json({ message: "Tur Güncellendi", tour: updateTour });
-  } catch (error) {
-    res.status(400).json({ message: "Bir hata oluştu", error: error.message });
-  }
-};
+exports.updateTour = factory.updateOne(Tour)
 
 //id'sine göre bir turu sil
-exports.deleteTour = async (req, res) => {
-  try {
-    await Tour.findByIdAndDelete(req.params.id);
-    res.status(204).json({ message: "Tur silindi" });
-  } catch (error) {
-    res.status(400).json({ message: "Bir hata oluştu", error: error.message });
-  }
-};
+exports.deleteTour = factory.deleteOne(Tour)

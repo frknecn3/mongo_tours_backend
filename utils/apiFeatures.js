@@ -10,7 +10,7 @@ class APIFeatures {
   filter() {
     // 1) turlar için sorgu oluştur (filtreleme ile)
     this.query = this.query.find(this.formattedParams);
-
+    
     return this;
   }
 
@@ -18,7 +18,7 @@ class APIFeatures {
     // 2) eğer sort parametresi varsa ona göre sırala yoksa en yeniyi en başa koy
     if (this.params.sort) {
       // mongodb sırlanıcak fieldların arasına "," değil " " istediği için güncelledik
-      this.query.sort(this.params.sort.split(",").join(" "));
+      this.query.sort(this.params.sort.replaceAll(","," "));
     } else {
       this.query.sort("-createdAt");
     }
@@ -29,7 +29,7 @@ class APIFeatures {
   limit() {
     // 3) eğer fields parametresi varsa alan limitle
     if (this.params.fields) {
-      const fields = this.params.fields.split(",").join(" ");
+      const fields = this.params.fields.replaceAll(","," ");
       this.query.select(fields);
     }
 
